@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@ionic/portals": "~0.8.1",
+    "@ionic/portals": "0.10.0",
     "@ionic/react": "^6.0.0",
     "@ionic/react-router": "^6.0.0",
     "ionicons": "^5.4.0",
@@ -39,8 +39,8 @@
   },
   "description": "An Ionic project",
   "devDependencies": {
-    "@capacitor/cli": "^5.0.0",
-    "@capacitor/ios": "^5.0.3",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.6.3",
