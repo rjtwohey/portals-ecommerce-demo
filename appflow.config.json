@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "appId": "ccabf2bf",
+      "root": "web/",
+      "dependencyInstallCommand": "npm install --legacy-peer-deps"
+    }
+  ]
+}
