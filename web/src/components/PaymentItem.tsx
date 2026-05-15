@@ -40,7 +40,7 @@ const PaymentItem: React.FC<PaymentItemProps> = ({
         ></IonCheckbox>
       )}
       <IonLabel className="ion-text-wrap">
-        {creditCard.company} ending in {creditCard.number.slice(-4)}
+        Your credit card - {creditCard.company} ending in {creditCard.number.slice(-4)}
       </IonLabel>
       <IonButton
         fill="clear"
