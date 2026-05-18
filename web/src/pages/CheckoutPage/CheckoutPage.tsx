@@ -119,7 +119,7 @@ const CheckoutPage: React.FC = () => {
                   Portals.publish({ topic: 'dismiss', data: result });
                 }}
               >
-                Place Your Order Here
+                Please Place Your Order
               </IonButton>
             </>
           )}
