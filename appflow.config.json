@@ -4,6 +4,11 @@
       "appId": "ccabf2bf",
       "root": "web/",
       "dependencyInstallCommand": "npm install --legacy-peer-deps"
+    },
+    {
+      "appId": "535e2752",
+      "root": "featured-component/",
+      "dependencyInstallCommand": "npm install --legacy-peer-deps"
     }
   ]
 }
