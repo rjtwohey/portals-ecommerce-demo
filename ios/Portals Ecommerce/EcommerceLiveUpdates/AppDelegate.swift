@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //         PortalsRegistrationManager.shared.register(key: "YOUR_KEY_HERE")
         try? LiveUpdateManager.shared.add(.help)
         try? LiveUpdateManager.shared.add(.webapp)
+        try? LiveUpdateManager.shared.add(.featured)
         return true
     }
 
@@ -72,22 +73,29 @@ extension Portal {
 
     static let featured = Self(
         name: "featured",
-        startDir: "portals/featured"
+        startDir: "portals/featured",
+        liveUpdateConfig: .featured
     )
 }
 
 extension LiveUpdate {
-    private static let activeChannel = UserDefaults.standard.string(forKey: "active_channel") ?? "production"
+    private static let activeChannel = "production"
     
     static let webapp = Self(
-        appId: "186b544f",
+        appId: "ccabf2bf",
         channel: activeChannel,
-        syncOnAdd: false
+        syncOnAdd: true
     )
     
     static let help = Self(
-        appId: "a81b2440",
+        appId: "ccabf2bf",
         channel: activeChannel,
-        syncOnAdd: false
+        syncOnAdd: true
+    )
+
+    static let featured = Self(
+        appId: "535e2752",
+        channel: activeChannel,
+        syncOnAdd: true
     )
 }

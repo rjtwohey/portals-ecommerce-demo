@@ -1,5 +1,6 @@
 import UIKit
 import IonicPortals
+import IonicLiveUpdates
 import CapacitorCamera
 
 @main
@@ -9,6 +10,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Register Portals
         // PortalsRegistrationManager.shared.register(key: "")
+
+        try? LiveUpdateManager.shared.add(.help)
+        try? LiveUpdateManager.shared.add(.webapp)
+        try? LiveUpdateManager.shared.add(.featured)
+
         return true
     }
 
@@ -30,7 +36,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension Portal {
     static let featured = Self(
         name: "featured",
-        startDir: "portals/featured"
+        startDir: "portals/featured",
+        liveUpdateConfig: .featured
     )
 
     private static let commonPlugins: [Plugin] = [
@@ -46,22 +53,47 @@ extension Portal {
         name: "checkout",
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/checkout"],
-        plugins: commonPlugins
+        plugins: commonPlugins,
+        liveUpdateConfig: .webapp
     )
     
     static let help = Self(
         name: "help",
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/help"],
-        plugins: commonPlugins
+        plugins: commonPlugins,
+        liveUpdateConfig: .help
     )
     
     static let user = Self(
         name: "user",
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/user"],
-        plugins: commonPlugins
+        plugins: commonPlugins,
+        liveUpdateConfig: .webapp
     )
     .adding(CameraPlugin.self)
+}
+
+extension LiveUpdate {
+    private static let activeChannel = "production"
+
+    static let webapp = Self(
+        appId: "ccabf2bf",
+        channel: activeChannel,
+        syncOnAdd: true
+    )
+
+    static let help = Self(
+        appId: "ccabf2bf",
+        channel: activeChannel,
+        syncOnAdd: true
+    )
+
+    static let featured = Self(
+        appId: "535e2752",
+        channel: activeChannel,
+        syncOnAdd: true
+    )
 }
 
