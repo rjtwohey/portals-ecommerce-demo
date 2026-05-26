@@ -56,7 +56,7 @@ const CheckoutPage: React.FC = () => {
               Cancel
             </IonButton>
           </IonButtons>
-          <IonTitle>Checkout</IonTitle>
+          <IonTitle>Checkout v2</IonTitle>
         </IonToolbar>
       </IonHeader>
       <FadeIn isLoaded={user != null && cart != null}>
