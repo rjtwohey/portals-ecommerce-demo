@@ -19,6 +19,22 @@ xed Portals\ Ecommerce.xcworkspace
 
 It is **important** that you open the `xcworkspace` and _not_ the `xcodeproj` file.
 
+### Capawesome Live Update Provider SDK (iOS)
+
+This project is configured to use the Capawesome provider integration with Ionic Portals:
+
+- `Podfile` includes `CapawesomeCapacitorLiveUpdate/IonicProvider`
+- `IonicPortals` is pinned to `0.14.0-rc.0` to use `liveUpdateProvider`
+- Portals in both iOS targets are configured with
+	`.provider(liveUpdateManager: ...)` created from `LiveUpdateProviderRegistry.shared.resolve("capawesome")`
+
+If pods are out of date, run:
+
+```bash
+cd ./ios/Portals\ Ecommerce
+pod update IonicPortals IonicLiveUpdates
+```
+
 ### Portals registration key
 
 Get you registration key from [ionic.io/register-portals](https://ionic.io/register-portals), then uncomment the following line in `AppDelegate.swift` and replace `YOUR_KEY_HERE` with your key.

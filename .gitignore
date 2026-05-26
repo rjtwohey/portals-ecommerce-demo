@@ -2,3 +2,5 @@
 webapp
 ios/Portals Ecommerce/Portals Ecommerce/.portals/
 ios/Portals Ecommerce/Portals Ecommerce/.portals.yaml
+node_modules/
+vendor/

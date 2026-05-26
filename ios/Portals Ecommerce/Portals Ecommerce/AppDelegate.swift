@@ -1,21 +1,59 @@
 import UIKit
 import IonicPortals
-import IonicLiveUpdates
 import CapacitorCamera
+import CapawesomeCapacitorLiveUpdate
+import LiveUpdateProvider
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    private static let maxSyncAttempts = 20
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
 
         // Register Portals
         // PortalsRegistrationManager.shared.register(key: "")
 
-        try? LiveUpdateManager.shared.add(.help)
-        try? LiveUpdateManager.shared.add(.webapp)
-        try? LiveUpdateManager.shared.add(.featured)
+        scheduleProviderSync(attempt: 1)
 
         return true
+    }
+
+    private func scheduleProviderSync(attempt: Int) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            Task {
+                await self.syncProviderPortals(attempt: attempt)
+            }
+        }
+    }
+
+    @MainActor
+    private func syncProviderPortals(attempt: Int) async {
+        let portalsToSync: [Portal] = [.checkout, .help, .featured]
+        var failedPortalNames: [String] = []
+
+        for portal in portalsToSync {
+            do {
+                _ = try await portal.syncProvider()
+                print("Capawesome provider sync succeeded for portal '\(portal.name)'.")
+            } catch {
+                failedPortalNames.append(portal.name)
+                print("Capawesome provider sync failed for portal '\(portal.name)': \(error.localizedDescription)")
+            }
+        }
+
+        if failedPortalNames.isEmpty {
+            print("Capawesome provider sync completed for all portals.")
+            return
+        }
+
+        if attempt >= Self.maxSyncAttempts {
+            print("Capawesome provider sync did not complete after \(Self.maxSyncAttempts) attempts. Remaining portals: \(failedPortalNames.joined(separator: ", "))")
+            return
+        }
+
+        print("Retrying Capawesome provider sync (attempt \(attempt + 1)/\(Self.maxSyncAttempts)) for portals: \(failedPortalNames.joined(separator: ", "))")
+        scheduleProviderSync(attempt: attempt + 1)
     }
 
     // MARK: UISceneSession Lifecycle
@@ -34,13 +72,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension Portal {
+    private static let webAppId = "0ca581ce-f6cc-4e2c-a5f8-47a8169371c4"
+    private static let featuredAppId = "791104da-928d-43ac-8c06-5c01462e460e"
+    private static let activeChannel = "default"
+
+    private static func providerManager(for target: String) -> (any LiveUpdateManaging)? {
+        let config: [String: Any]
+        switch target {
+        case "webapp":
+            config = [
+                "managerKey": "portal-webapp",
+                "appId": webAppId,
+                "channel": activeChannel
+            ]
+        case "help":
+            config = [
+                "managerKey": "portal-help",
+                "appId": webAppId,
+                "channel": activeChannel
+            ]
+        case "featured":
+            config = [
+                "managerKey": "portal-featured",
+                "appId": featuredAppId,
+                "channel": activeChannel
+            ]
+        default:
+            return nil
+        }
+
+        return DeferredCapawesomeLiveUpdateManager(config: config)
+    }
+
     static let featured = Self(
         name: "featured",
         startDir: "portals/featured",
-        liveUpdateConfig: .featured
+        plugins: [.type(LiveUpdatePlugin.self)],
+        liveUpdateProvider: providerManager(for: "featured").map { .provider(liveUpdateManager: $0) }
     )
 
     private static let commonPlugins: [Plugin] = [
+        .type(LiveUpdatePlugin.self),
         .type(ShopAPIPlugin.self),
         .instance(
             WebVitalsPlugin { portalName, duration in
@@ -54,7 +126,7 @@ extension Portal {
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/checkout"],
         plugins: commonPlugins,
-        liveUpdateConfig: .webapp
+        liveUpdateProvider: providerManager(for: "webapp").map { .provider(liveUpdateManager: $0) }
     )
     
     static let help = Self(
@@ -62,7 +134,7 @@ extension Portal {
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/help"],
         plugins: commonPlugins,
-        liveUpdateConfig: .help
+        liveUpdateProvider: providerManager(for: "help").map { .provider(liveUpdateManager: $0) }
     )
     
     static let user = Self(
@@ -70,30 +142,33 @@ extension Portal {
         startDir: "portals/shopwebapp",
         initialContext: ["startingRoute": "/user"],
         plugins: commonPlugins,
-        liveUpdateConfig: .webapp
+        liveUpdateProvider: providerManager(for: "webapp").map { .provider(liveUpdateManager: $0) }
     )
     .adding(CameraPlugin.self)
 }
 
-extension LiveUpdate {
-    private static let activeChannel = "production"
+private final class DeferredCapawesomeLiveUpdateManager: LiveUpdateManaging {
+    private static let providerId = "capawesome"
 
-    static let webapp = Self(
-        appId: "ccabf2bf",
-        channel: activeChannel,
-        syncOnAdd: true
-    )
+    private let config: [String: Any]
+    private var currentManager: (any LiveUpdateManaging)?
 
-    static let help = Self(
-        appId: "ccabf2bf",
-        channel: activeChannel,
-        syncOnAdd: true
-    )
+    var latestAppDirectory: URL? {
+        currentManager?.latestAppDirectory
+    }
 
-    static let featured = Self(
-        appId: "535e2752",
-        channel: activeChannel,
-        syncOnAdd: true
-    )
+    init(config: [String: Any]) {
+        self.config = config
+    }
+
+    func sync() async throws -> any LiveUpdateProvider.SyncResult {
+        guard let provider = LiveUpdateProviderRegistry.shared.resolve(Self.providerId) else {
+            throw LiveUpdateProviderError.providerNotRegistered(Self.providerId)
+        }
+
+        let manager = try provider.createManager(config: config)
+        currentManager = manager
+        return try await manager.sync()
+    }
 }
 
