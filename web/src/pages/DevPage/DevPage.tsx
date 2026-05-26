@@ -1,5 +1,6 @@
 import React from 'react';
 import { IonButton, IonContent, IonPage } from '@ionic/react';
+import LiveUpdateProviderTestPanel from '../../components/LiveUpdateProviderTestPanel';
 
 const DevPage: React.FC = () => (
   <IonPage>
@@ -19,6 +20,7 @@ const DevPage: React.FC = () => (
       <IonButton expand="block" href="/new-featured">
         New Featured Component
       </IonButton>
+      <LiveUpdateProviderTestPanel target="webapp" />
     </IonContent>
   </IonPage>
 );

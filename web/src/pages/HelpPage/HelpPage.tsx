@@ -2,6 +2,7 @@ import React from 'react';
 import { IonContent, IonIcon, IonItem, IonPage } from '@ionic/react';
 import { callOutline, mailOutline } from 'ionicons/icons';
 import FadeIn from '../../components/FadeIn';
+import LiveUpdateProviderTestPanel from '../../components/LiveUpdateProviderTestPanel';
 
 import './HelpPage.scss';
 
@@ -33,6 +34,7 @@ const HelpPage = () => {
               1-800-PORTALS
             </a>
           </IonItem>
+          <LiveUpdateProviderTestPanel target="help" />
         </IonContent>
       </FadeIn>
     </IonPage>

@@ -13,7 +13,6 @@ import {
   IonToolbar,
   useIonRouter,
 } from '@ionic/react';
-import { registerPlugin } from '@capacitor/core';
 import { DataContext } from '../../DataProvider';
 import './CheckoutPage.scss';
 import { Address, CreditCard } from '../../ShopAPIPlugin';
@@ -21,50 +20,13 @@ import AddressItem from '../../components/AddressItem';
 import PaymentItem from '../../components/PaymentItem';
 import * as Portals from '@ionic/portals';
 import FadeIn from '../../components/FadeIn';
-
-interface IonicProviderTestPlugin {
-  isProviderRegistered(): Promise<{ registered: boolean }>;
-  getLatestAppDirectory(options: {
-    liveUpdateTarget: 'help' | 'webapp' | 'featured';
-  }): Promise<{ latestAppDirectory: string | null }>;
-  syncManager(options: {
-    liveUpdateTarget: 'help' | 'webapp' | 'featured';
-  }): Promise<{ latestAppDirectory: string | null; metadata?: Record<string, unknown> }>;
-}
-
-const IonicProviderTest = registerPlugin<IonicProviderTestPlugin>('IonicProviderTest');
-
-const providerConfig = {
-  liveUpdateTarget: 'webapp' as const,
-};
+import LiveUpdateProviderTestPanel from '../../components/LiveUpdateProviderTestPanel';
 
 const CheckoutPage: React.FC = () => {
   const { cart, user, checkout } = useContext(DataContext);
   const [selectedAddress, setSelectedAddress] = useState<Address>();
   const [selectedCreditCard, setSelectedCreditCard] = useState<CreditCard>();
-  const [providerTestOutput, setProviderTestOutput] = useState<string>('Not run yet.');
-  const [providerTestRunning, setProviderTestRunning] = useState<boolean>(false);
   const router = useIonRouter();
-
-  const runProviderTest = async (action: 'isProviderRegistered' | 'getLatestAppDirectory' | 'syncManager') => {
-    setProviderTestRunning(true);
-    try {
-      let result: unknown;
-      if (action === 'isProviderRegistered') {
-        result = await IonicProviderTest.isProviderRegistered();
-      } else if (action === 'getLatestAppDirectory') {
-        result = await IonicProviderTest.getLatestAppDirectory(providerConfig);
-      } else {
-        result = await IonicProviderTest.syncManager(providerConfig);
-      }
-      setProviderTestOutput(JSON.stringify(result, null, 2));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      setProviderTestOutput(`Error: ${message}`);
-    } finally {
-      setProviderTestRunning(false);
-    }
-  };
 
   useEffect(() => {
     if (user && !selectedAddress) {
@@ -161,38 +123,7 @@ const CheckoutPage: React.FC = () => {
                 Place Your Order Please
               </IonButton>
 
-              <div className="provider-test-panel">
-                <IonListHeader>Live Update Provider Test</IonListHeader>
-                <p className="provider-test-panel__help">
-                  Uses IonicProviderTest plugin with live update target <strong>{providerConfig.liveUpdateTarget}</strong>.
-                </p>
-                <div className="provider-test-panel__actions">
-                  <IonButton
-                    size="small"
-                    fill="outline"
-                    disabled={providerTestRunning}
-                    onClick={() => runProviderTest('isProviderRegistered')}
-                  >
-                    Is Provider Registered?
-                  </IonButton>
-                  <IonButton
-                    size="small"
-                    fill="outline"
-                    disabled={providerTestRunning}
-                    onClick={() => runProviderTest('getLatestAppDirectory')}
-                  >
-                    Get Latest App Directory
-                  </IonButton>
-                  <IonButton
-                    size="small"
-                    disabled={providerTestRunning}
-                    onClick={() => runProviderTest('syncManager')}
-                  >
-                    Sync Manager
-                  </IonButton>
-                </div>
-                <pre className="provider-test-panel__output">{providerTestOutput}</pre>
-              </div>
+              <LiveUpdateProviderTestPanel target="webapp" />
             </>
           )}
         </IonContent>

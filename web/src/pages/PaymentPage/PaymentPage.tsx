@@ -24,6 +24,7 @@ import { RouteComponentProps } from 'react-router';
 import { DataContext } from '../../DataProvider';
 import './PaymentPage.css';
 import { CreditCard, User } from '../../ShopAPIPlugin';
+import LiveUpdateProviderTestPanel from '../../components/LiveUpdateProviderTestPanel';
 
 type PaymentPageMatch = {
   id: string;
@@ -233,6 +234,7 @@ const PaymentPage = (props: RouteComponentProps<PaymentPageMatch>) => {
         <IonButton expand="block" onClick={handleSave}>
           Save
         </IonButton>
+        <LiveUpdateProviderTestPanel target="webapp" />
       </IonContent>
     </IonPage>
   );
