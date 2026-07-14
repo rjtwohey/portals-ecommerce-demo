@@ -55,7 +55,7 @@ const CheckoutPage: React.FC = () => {
               Cancel
             </IonButton>
           </IonButtons>
-          <IonTitle>Checkout v2</IonTitle>
+          <IonTitle>Checkout via the new Capawesome Live Update Provider v1</IonTitle>
         </IonToolbar>
       </IonHeader>
       <FadeIn isLoaded={user != null && cart != null}>
