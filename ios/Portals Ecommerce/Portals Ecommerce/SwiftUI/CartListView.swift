@@ -61,7 +61,6 @@ struct CartListView_Previews: PreviewProvider {
         }
         .onAppear {
             // Register Portals
-            PortalsRegistrationManager.shared.register(key: "YOUR KEY HERE");
         }
     }
 }
